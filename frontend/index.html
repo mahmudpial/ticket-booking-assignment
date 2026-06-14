@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking.com Simulation</title>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  </head>
+  <body>
+    <div
+      style="
+        text-align: center;
+        margin-top: 50px;
+        font-family: Arial, sans-serif;
+      "
+    >
+      <h1>Booking.com Portal</h1>
+      <p id="status-message">Real-time ticket updates. please wait...</p>
+    </div>
+
+    <script>
+      // Enable console logging for Pusher
+      Pusher.logToConsole = true;
+
+      // Initialize Pusher
+      var pusher = new Pusher("104507171a12c53a6f60", {
+        cluster: "mt1",
+      });
+
+      // Subscribe to the channel
+      var channel = pusher.subscribe("my-custom-notification");
+      channel.bind("my-ticket-booking-event", function (data) {
+        console.log("New Event Received:", data);
+
+        //new div and style it for notification and append it to the body
+        const notificationBox = document.createElement("div");
+        notificationBox.style.cssText = `
+        padding: 15px;
+        margin: 10px 0;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+    `;
+        notificationBox.innerText = "🔔 " + data.message;
+
+        // timeout to remove the notification box after 5 seconds
+        setTimeout(() => {
+          notificationBox.remove();
+        }, 5000);
+
+        const body = document.body;
+        const firstChild = body.firstChild;
+        body.insertBefore(notificationBox, firstChild);
+
+        // Update the status message
+        const statusMessage = document.getElementById("status-message");
+        statusMessage.innerText = "New ticket update received!";
+      });
+    </script>
+  </body>
+</html>
